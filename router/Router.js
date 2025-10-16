@@ -82,4 +82,9 @@ router.get("/profile",auth,userProfile);
 router.post("/send-message",auth,sendMsg);
 router.get("/get-message/:id",auth,getMsg);
 
+
+router.get("/helth",(req,res)=>{
+        res.send("Server Running")
+})
+
 module.exports = router;
