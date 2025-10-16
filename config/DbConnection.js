@@ -1,13 +1,20 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 require("dotenv").config();
 
-exports.dbConnect = async() =>{
-    try {
-        await mongoose.connect(process.env.DB_URL,{ useNewUrlParser: true, useUnifiedTopology: true })
-        .then(()=>{
-            console.log("DB Connected Successfully")
-        })
-    } catch (error) {
-        console.log(`DB error ${error}`)
-    }
-}
+exports.dbConnect = async () => {
+  const dbUrl = process.env.DB_URL;
+  if (!dbUrl) {
+    console.error("DB_URL is not defined in environment variables!");
+    return;
+  }
+
+  try {
+    await mongoose.connect(dbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("DB Connected Successfully");
+  } catch (error) {
+    console.log(`DB error: ${error}`);
+  }
+};
