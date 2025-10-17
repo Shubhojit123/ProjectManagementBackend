@@ -90,7 +90,7 @@ exports.login = async (req, res) => {
 
 
         const token = jwt.sign({ email: userExist.email }, process.env.JWT_SECRET, { expiresIn: 24 * 60 * 60 });
-
+          const isProduction = req.headers.origin?.includes("vercel.app");
          const cookiesOption = {
                   httpOnly: true,
                   secure: isProduction,  
