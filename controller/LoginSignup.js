@@ -96,6 +96,8 @@ exports.login = async (req, res) => {
       httpOnly: true,
       maxAge: 48 * 60 * 60 * 1000,
       secure: false,
+      sameSite: "lax", 
+      path: "/"
     };
 
     await Logout.deleteMany({ email: userExist.email });
