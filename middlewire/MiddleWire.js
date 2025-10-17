@@ -5,6 +5,9 @@ require("dotenv").config();
 
 
 exports.auth = async (req, res, next) => {
+    console.log(req,"Request");
+    console.log(req.headers,"headers");
+    
     const authHeader = req.headers['authorization'];
     const token = req.cookies.token ;
     if (!token) {
