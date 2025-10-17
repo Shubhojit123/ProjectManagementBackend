@@ -5,11 +5,11 @@ require("dotenv").config();
 
 
 exports.auth = async (req, res, next) => {
-    console.log(req,"Request");
-    console.log(req.headers,"headers");
+   
     
     const authHeader = req.headers['authorization'];
     const token = req.cookies.token ;
+    console.log(req.cookies)
     if (!token) {
         return res.status(400).json({ message: "Please login again" });
     }
