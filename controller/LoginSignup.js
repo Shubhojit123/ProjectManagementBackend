@@ -92,11 +92,8 @@ exports.login = async (req, res) => {
       expiresIn: 24 * 60 * 60,
     });
 
-    const isProduction = process.env.NODE_ENV === "production";
     const cookiesOption = {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "None" : "Lax",
       maxAge: 48 * 60 * 60 * 1000,
     };
 
