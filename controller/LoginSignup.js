@@ -66,54 +66,56 @@ exports.signUp = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  const loginValidation = z.object({
+    email: z.string().email({ message: "Enter valid email" }),
+    password: z.string().min(5, { message: "Enter 5 digit" }),
+  });
 
-    const loginValidation = z.object({
-        email: z.string().email({ message: "Enter valid email" }),
-        password: z.string().min(5, { message: "Enter 5 digit" })
+  try {
+    const validResult = loginValidation.safeParse(req.body);
+    if (!validResult.success) {
+      return res.status(500).json({ error: validResult.error.issues[0].message });
+    }
+
+    const { email, password } = req.body;
+    const userExist = await User.findOne({ email });
+    if (!userExist) {
+      return res.status(400).json({ error: "User not exist" });
+    }
+
+    const passwordCheck = await bcrypt.compare(password, userExist.password);
+    if (!passwordCheck) {
+      return res.status(400).json({ error: "Please enter correct password" });
+    }
+
+    const token = jwt.sign({ email: userExist.email }, process.env.JWT_SECRET, {
+      expiresIn: 24 * 60 * 60,
     });
 
-    try {
-        const validResult = loginValidation.safeParse(req.body);
-        if (!validResult.success) {
-            return res.status(500).json({ error: validResult.error.issues[0].message, message: "Zod " });
-        }
-        const { email, password } = req.body;
-        const userExist = await User.findOne({ email });
-        if (!userExist) {
-            return res.status(400).json({ error: "User not exist" });
-        }
-        const dbPassword = userExist.password;
-        const passwordCheck = await bcrypt.compare(password, dbPassword);
-        if (!passwordCheck) {
-            return res.status(400).json({ error: "Please enter correct password" });
-        }
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookiesOption = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+      maxAge: 48 * 60 * 60 * 1000,
+    };
 
+    await Logout.deleteMany({ email: userExist.email });
 
-        const token = jwt.sign({ email: userExist.email }, process.env.JWT_SECRET, { expiresIn: 24 * 60 * 60 });
-          const isProduction = req.headers.origin?.includes("vercel.app");
-         const cookiesOption = {
-                  httpOnly: true,
-                  secure: isProduction,  
-                  sameSite: "None",
-                  sameSite: isProduction ? "None" : "Lax", 
-                  maxAge: 48 * 60 * 60 * 1000,
-            };
-        await Logout.deleteMany({ email: userExist.email });
-        return res
-            .cookie("token", token, cookiesOption)
-            .status(200)
-            .json({
-                success: true,
-                token,
-                message: "Login Successfully",
-                role: userExist.role
-            });
+    return res
+      .cookie("token", token, cookiesOption)
+      .status(200)
+      .json({
+        success: true,
+        message: "Login Successfully",
+        role: userExist.role,
+      });
+  } catch (error) {
+    console.log("Login error:", error);
+    return res.status(500).json({ error: "Internal Server error" });
+  }
+};
 
-    } catch (error) {
-        console.log(`Login error${error}`);
-        return res.status(500).json({ error: "Internal Server error" });
-    }
-}
 
 
 exports.logout = async (req, res) => {
