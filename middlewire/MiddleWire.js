@@ -41,7 +41,7 @@ exports.isAdmin = async (req, res, next) => {
         const userExist = await User.findOne({ email });
         const role = userExist.role;
         if (role === null) {
-            return res.status(400).json({ message: "Please Login again" })
+            return res.status(400).json({ message: "Please Login again Admin" })
         }
         if (role === "Admin") {
             next();
