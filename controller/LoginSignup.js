@@ -91,11 +91,13 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ email: userExist.email }, process.env.JWT_SECRET, { expiresIn: 24 * 60 * 60 });
 
-        const cookiesOption = {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-            sameSite: 'lax'
-        };
+         const cookiesOption = {
+                  httpOnly: true,
+                  secure: isProduction,  
+                  sameSite: "None",
+                  sameSite: isProduction ? "None" : "Lax", 
+                  maxAge: 48 * 60 * 60 * 1000,
+            };
         await Logout.deleteMany({ email: userExist.email });
         return res
             .cookie("token", token, cookiesOption)
