@@ -9,7 +9,7 @@ exports.auth = async (req, res, next) => {
     
     const authHeader = req.headers['authorization'];
     const token = req.cookies.token ;
-    console.log(req.cookies)
+    console.log(token)
     if (!token) {
         return res.status(400).json({ message: "Please login again" });
     }
