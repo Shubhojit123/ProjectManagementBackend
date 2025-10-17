@@ -95,6 +95,7 @@ exports.login = async (req, res) => {
     const cookiesOption = {
       httpOnly: true,
       maxAge: 48 * 60 * 60 * 1000,
+      secure: false,
     };
 
     await Logout.deleteMany({ email: userExist.email });
